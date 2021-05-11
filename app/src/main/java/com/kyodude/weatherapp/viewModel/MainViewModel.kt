@@ -5,7 +5,6 @@ import android.view.animation.Animation
 import android.view.animation.LinearInterpolator
 import android.view.animation.RotateAnimation
 import androidx.lifecycle.*
-import com.kyodude.weatherapp.model.dataModels.ForecastItem
 import com.kyodude.weatherapp.model.dataModels.ForecastListItem
 import com.kyodude.weatherapp.repository.MainRepository
 import com.kyodude.weatherapp.util.DispatcherProvider
@@ -65,12 +64,12 @@ class MainViewModel @Inject constructor(
                                     while (index< forecastResponse.data.cnt)
                                     {
                                         try {
-                                            val temp = if (index+8<forecastResponse.data.cnt)
+                                            val temperature = if (index+8<forecastResponse.data.cnt)
                                                 forecastResponse.data.list.subList(index,index+8).getAvgTemp()
                                             else
                                                 forecastResponse.data.list.subList(index,index+(forecastResponse.data.cnt-index)).getAvgTemp()
 
-                                            val item = ForecastListItem(forecastResponse.data.list.get(index).dtTxt, temp.toInt())
+                                            val item = ForecastListItem(forecastResponse.data.list.get(index).dtTxt, temperature.toInt())
                                             list.add(item)
                                             index+=8
                                         }
