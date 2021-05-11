@@ -8,7 +8,6 @@
     android:layout_height="wrap_content"
     android:id="@+id/bottomSheet"
     android:background="@color/white"
-    android:layout_marginTop="62dp"
     app:behavior_hideable="false"
     app:behavior_peekHeight="0dp">
 
