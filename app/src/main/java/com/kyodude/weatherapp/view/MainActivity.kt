@@ -4,9 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.view.animation.Animation
-import android.view.animation.LinearInterpolator
-import android.view.animation.RotateAnimation
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.ViewModelProvider
@@ -44,16 +41,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        val rotateAnimation = RotateAnimation(
-                0f, 359f,
-                Animation.RELATIVE_TO_SELF, 0.5f,
-                Animation.RELATIVE_TO_SELF, 0.5f
 
-        )
-        rotateAnimation.duration = 1500
-        rotateAnimation.interpolator = LinearInterpolator()
-        rotateAnimation.repeatCount = RotateAnimation.INFINITE
-        binding.loader.startAnimation(rotateAnimation)
+        binding.loader.startAnimation(mainViewModel.getRotateAnimation())
         mainViewModel.setCity(Config.city)
 
         lifecycleScope.launchWhenStarted {

@@ -1,6 +1,9 @@
 package com.kyodude.weatherapp.viewModel
 
 import android.util.Log
+import android.view.animation.Animation
+import android.view.animation.LinearInterpolator
+import android.view.animation.RotateAnimation
 import androidx.lifecycle.*
 import com.kyodude.weatherapp.model.dataModels.ForecastItem
 import com.kyodude.weatherapp.model.dataModels.ForecastListItem
@@ -94,5 +97,18 @@ class MainViewModel @Inject constructor(
             _dataFlow.value = HomeScreenEvent.Failure("Not a valid city name")
         else
             getTemperature(city)
+    }
+
+    fun getRotateAnimation(): RotateAnimation{
+        val rotateAnimation = RotateAnimation(
+                0f, 359f,
+                Animation.RELATIVE_TO_SELF, 0.5f,
+                Animation.RELATIVE_TO_SELF, 0.5f
+
+        )
+        rotateAnimation.duration = 1500
+        rotateAnimation.interpolator = LinearInterpolator()
+        rotateAnimation.repeatCount = RotateAnimation.INFINITE
+        return rotateAnimation
     }
 }
