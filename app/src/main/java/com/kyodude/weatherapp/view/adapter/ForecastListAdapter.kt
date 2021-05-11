@@ -1,6 +1,7 @@
 package com.kyodude.weatherapp.view.adapter
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.kyodude.weatherapp.databinding.ForecastItemBinding
@@ -22,8 +23,13 @@ class ForecastListAdapter: RecyclerView.Adapter<ForecastListAdapter.ForecastView
     }
 
     override fun onBindViewHolder(holder: ForecastViewHolder, position: Int) {
+        if(position!=itemCount-1) {
+            holder.binding.greyLine.visibility = View.VISIBLE
+        } else {
+            holder.binding.greyLine.visibility = View.INVISIBLE
+        }
         holder.binding.day.text = getDay(forecastList.get(position).dtTxt)
-        var str =  forecastList.get(position).temp.toString() + "°C"
+        val str =  forecastList.get(position).temp.toString() + "°C"
         holder.binding.dayTemp.text = str
     }
 
