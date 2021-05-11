@@ -1,10 +1,13 @@
 package com.kyodude.weatherapp.viewModel
 
+import android.util.Log
 import androidx.lifecycle.*
 import com.kyodude.weatherapp.model.dataModels.ForecastItem
 import com.kyodude.weatherapp.model.dataModels.ForecastListItem
 import com.kyodude.weatherapp.repository.MainRepository
 import com.kyodude.weatherapp.util.DispatcherProvider
+import com.kyodude.weatherapp.util.Extensions.getAvgTemp
+import com.kyodude.weatherapp.util.Extensions.getOffset
 import com.kyodude.weatherapp.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,12 +21,13 @@ class MainViewModel @Inject constructor(
     private val mainRepository: MainRepository,
     private val dispatchers: DispatcherProvider
 ): ViewModel() {
-    val TAG = "MainActivity"
 
-    inner class HomeData {
-        var temp: String = ""
-        var forecast: List<ForecastListItem> = ArrayList()
-    }
+    val TAG = MainViewModel::class.java.simpleName
+
+    data class HomeData(
+            var temp: String = "",
+            var forecast: List<ForecastListItem> = ArrayList()
+    )
 
     sealed class HomeScreenEvent {
         class Success(val data: HomeData): HomeScreenEvent()
@@ -54,17 +58,23 @@ class MainViewModel @Inject constructor(
                                 if(forecastResponse.data?.list == null) {
                                     _dataFlow.value = HomeScreenEvent.Failure("Unexpected error in weather call")
                                 } else {
-                                    var index = getOffset(forecastResponse.data.list)
+                                    var index = forecastResponse.data.list.getOffset()
                                     while (index< forecastResponse.data.cnt)
                                     {
-                                        val temp = if (index+8<forecastResponse.data.cnt)
-                                            getAvgTemp(forecastResponse.data.list.subList(index,index+8))
-                                        else
-                                            getAvgTemp(forecastResponse.data.list.subList(index,index+(forecastResponse.data.cnt-index)))
+                                        try {
+                                            val temp = if (index+8<forecastResponse.data.cnt)
+                                                forecastResponse.data.list.subList(index,index+8).getAvgTemp()
+                                            else
+                                                forecastResponse.data.list.subList(index,index+(forecastResponse.data.cnt-index)).getAvgTemp()
 
-                                        val item = ForecastListItem(forecastResponse.data.list.get(index).dtTxt, temp.toInt())
-                                        list.add(item)
-                                        index+=8
+                                            val item = ForecastListItem(forecastResponse.data.list.get(index).dtTxt, temp.toInt())
+                                            list.add(item)
+                                            index+=8
+                                        }
+                                        catch (e:ArithmeticException) {
+                                            e.printStackTrace()
+                                            Log.e(TAG,"Divide by zero")
+                                        }
                                     }
                                     data.forecast = list
                                     _dataFlow.value = HomeScreenEvent.Success(
@@ -79,26 +89,10 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    private fun getAvgTemp(list: List<ForecastItem>): Double {
-        var sum = 0.0
-        for (i in list) {
-            sum+=i.main.temp
-        }
-        return sum/list.size
-    }
-
-    private fun getOffset(list: List<ForecastItem>): Int {
-        var found = false
-        var i = 0
-        while (!found) {
-            val x = list[i].dtTxt.split(" ")[1].split(":")[0].toInt()
-            if(x==0) found = true
-            else i++
-        }
-        return i
-    }
-
     fun setCity(city: String) {
-        getTemperature(city)
+        if (city.equals(null)|| city.equals(""))
+            _dataFlow.value = HomeScreenEvent.Failure("Not a valid city name")
+        else
+            getTemperature(city)
     }
 }
