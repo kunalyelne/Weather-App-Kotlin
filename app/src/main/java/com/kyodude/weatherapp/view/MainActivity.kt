@@ -4,18 +4,22 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.flow.collect
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.kyodude.weatherapp.view.adapter.ForecastListAdapter
 import com.kyodude.weatherapp.databinding.ActivityMainBinding
 import com.kyodude.weatherapp.model.api.Config
+import com.kyodude.weatherapp.util.dp2px
+import com.kyodude.weatherapp.util.screenRectPx
+import com.kyodude.weatherapp.view.adapter.ForecastListAdapter
 import com.kyodude.weatherapp.viewModel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collect
+
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -33,6 +37,10 @@ class MainActivity : AppCompatActivity() {
         mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
         binding.include.forecastList.layoutManager = LinearLayoutManager(this)
         adapter = ForecastListAdapter()
+        val height = screenRectPx.height() - binding.currentTemp.height - binding.cityName.height - 320.dp2px
+        val params: ViewGroup.LayoutParams = binding.include.forecastList.layoutParams
+        params.height = height
+        binding.include.forecastList.layoutParams = params
         binding.include.forecastList.adapter = adapter
 
         bottomSheetBehavior = BottomSheetBehavior.from(binding.include.bottomSheet)
